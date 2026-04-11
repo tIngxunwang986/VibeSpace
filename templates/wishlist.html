@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}VibeSpace — Wishlist{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="bi bi-heart"></i> My Wishlist</h2>
+
+{% if items %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for item in items %}
+    <div class="col">
+        <div class="card bg-dark border-secondary h-100">
+            <div class="card-body">
+                <h5>
+                    <a href="{{ url_for('game_detail', game_id=item.game_id) }}" class="text-info text-decoration-none">
+                        {{ item.title }}
+                    </a>
+                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="badge bg-info">
+                        {% if item.price == 0 %}Free{% else %}${{ '%.2f'|format(item.price) }}{% endif %}
+                    </span>
+                    {% if item.avg_rating %}
+                    <span class="text-warning small">
+                        <i class="bi bi-star-fill"></i> {{ '%.1f'|format(item.avg_rating) }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-secondary small mb-2">Added: {{ item.added_date }}</p>
+                <form method="POST" action="{{ url_for('wishlist_remove') }}">
+                    <input type="hidden" name="game_id" value="{{ item.game_id }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="bi bi-heart-fill"></i> Remove
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center text-secondary py-5">
+    <i class="bi bi-heart" style="font-size:3rem;"></i>
+    <p class="mt-3">Your wishlist is empty. <a href="{{ url_for('index') }}" class="text-info">Browse games</a> to find something you like!</p>
+</div>
+{% endif %}
+{% endblock %}
