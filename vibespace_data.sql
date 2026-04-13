@@ -1,6 +1,6 @@
 -- ============================================================
 -- VibeSpace | File 2: Sample Data (DML)
--- Bro Run AFTER vibespace_schema.sql
+-- Run AFTER vibespace_schema.sql
 -- ============================================================
 
 USE vibespace;

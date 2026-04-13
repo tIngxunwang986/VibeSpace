@@ -6,7 +6,7 @@ Author: Tingxun Wang
 
 from flask import (
     Flask, render_template, request, redirect,
-    url_for, session, flash, jsonify
+    url_for, session, flash
 )
 import mysql.connector
 from mysql.connector import Error
@@ -42,9 +42,7 @@ def login_required(f):
     return wrapper
 
 
-# ════════════════════════════════════════════════════════════
 #  AUTH ROUTES
-# ════════════════════════════════════════════════════════════
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -98,9 +96,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-# ════════════════════════════════════════════════════════════
 #  BROWSE / HOME
-# ════════════════════════════════════════════════════════════
 
 @app.route('/')
 def index():
@@ -134,10 +130,7 @@ def index():
                                'max_price': max_price
                            })
 
-
-# ════════════════════════════════════════════════════════════
 #  GAME DETAIL
-# ════════════════════════════════════════════════════════════
 
 @app.route('/game/<int:game_id>')
 def game_detail(game_id):
@@ -216,9 +209,7 @@ def game_detail(game_id):
                            user_review=user_review)
 
 
-# ════════════════════════════════════════════════════════════
 #  PURCHASE
-# ════════════════════════════════════════════════════════════
 
 @app.route('/purchase', methods=['POST'])
 @login_required
@@ -240,9 +231,7 @@ def purchase():
     return redirect(url_for('game_detail', game_id=game_id))
 
 
-# ════════════════════════════════════════════════════════════
 #  WISHLIST
-# ════════════════════════════════════════════════════════════
 
 @app.route('/wishlist')
 @login_required
@@ -300,9 +289,7 @@ def wishlist_remove():
     return redirect(request.referrer or url_for('wishlist'))
 
 
-# ════════════════════════════════════════════════════════════
 #  LIBRARY
-# ════════════════════════════════════════════════════════════
 
 @app.route('/library')
 @login_required
@@ -355,9 +342,7 @@ def library_update():
     return redirect(url_for('library'))
 
 
-# ════════════════════════════════════════════════════════════
 #  REVIEWS
-# ════════════════════════════════════════════════════════════
 
 @app.route('/review/add', methods=['POST'])
 @login_required
@@ -399,9 +384,7 @@ def review_delete():
     return redirect(url_for('game_detail', game_id=game_id))
 
 
-# ════════════════════════════════════════════════════════════
 #  COLLECTIONS
-# ════════════════════════════════════════════════════════════
 
 @app.route('/collections')
 @login_required
@@ -571,16 +554,15 @@ def collection_remove_game():
     return redirect(url_for('collection_detail', collection_id=collection_id))
 
 
-# ════════════════════════════════════════════════════════════
+
 #  DASHBOARD (Bonus — Analytics & Visualization)
-# ════════════════════════════════════════════════════════════
 
 @app.route('/dashboard')
 def dashboard():
     conn = get_db()
     cur = conn.cursor(dictionary=True)
 
-    # Query 1: Average rating by genre (multi-join: Games + Game_Genres + Genres + Reviews)
+    # Query 1: Average rating by genre
     cur.execute('''
         SELECT ge.genre_name,
                ROUND(AVG(r.rating), 2) AS avg_rating,
@@ -595,7 +577,6 @@ def dashboard():
     rating_by_genre = cur.fetchall()
 
     # Query 2: Top games by number of purchases
-    #          (multi-join: Games + Purchase_History + Developers)
     cur.execute('''
         SELECT g.title,
                d.name AS developer,
@@ -610,7 +591,6 @@ def dashboard():
     top_games = cur.fetchall()
 
     # Query 3: Platform popularity — total purchases per platform
-    #          (multi-join: Platforms + Purchase_History + Games)
     cur.execute('''
         SELECT pl.platform_name,
                COUNT(ph.purchase_id) AS total_purchases,
@@ -624,7 +604,6 @@ def dashboard():
     platform_stats = cur.fetchall()
 
     # Query 4: User spending leaderboard
-    #          (multi-join: Users + Purchase_History + User_Library)
     cur.execute('''
         SELECT u.username,
                GetTotalSpent(u.user_id) AS total_spent,
@@ -638,7 +617,6 @@ def dashboard():
     user_leaderboard = cur.fetchall()
 
     # Query 5: Completion status distribution across all users
-    #          (aggregation on User_Library)
     cur.execute('''
         SELECT completion_status, COUNT(*) AS count
         FROM User_Library
@@ -656,9 +634,7 @@ def dashboard():
                            completion_stats=completion_stats)
 
 
-# ════════════════════════════════════════════════════════════
 #  RUN
-# ════════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
