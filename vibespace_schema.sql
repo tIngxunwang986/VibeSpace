@@ -174,7 +174,11 @@ CREATE TABLE Completion_Log (
     log_id       INT      AUTO_INCREMENT PRIMARY KEY,
     user_id      INT      NOT NULL,
     game_id      INT      NOT NULL,
-    completed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    completed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_cl_user FOREIGN KEY (user_id)
+        REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_cl_game FOREIGN KEY (game_id)
+        REFERENCES Games(game_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE Free_Game_Report (
